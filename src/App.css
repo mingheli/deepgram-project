@@ -12,7 +12,22 @@
 .title {
   align-self: center;
 }
-
+.actionrow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.search {
+  display: flex;
+  margin-top: 20px;
+  font-weight: 600;
+}
+.search > input {
+  padding: 6px 10px;
+  border: 1px solid gray;
+  border-radius: 4px;
+  margin-left: 10px;
+}
 .upload {
   display: flex;
   align-self: flex-end;
@@ -36,6 +51,14 @@
 .header_cell {
   padding: 10px;
   border-bottom: 2px solid black;
+}
+
+.highlight {
+  color: blue
+}
+
+.header_cell:hover {
+ cursor: pointer;
 }
 
 .data_row {
@@ -107,4 +130,14 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.custom-sorting {
+  padding: 6px 26px;
+  cursor: pointer;
+  background-color: #00BB7C;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  text-transform: uppercase;
 }

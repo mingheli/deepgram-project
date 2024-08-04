@@ -1,4 +1,4 @@
-const Audios = ({ audioList, handleTranscribe }) => {
+const Audios = ({ audioList, handleTranscribe, searchKey, handleAudioPlay }) => {
     const handleDownload = (file) => {
         const element = document.createElement('a');
         const fileContent = file.transcript;
@@ -11,7 +11,9 @@ const Audios = ({ audioList, handleTranscribe }) => {
     };
     return (
         <>
-            {audioList.length > 0 && audioList.map((file, index) => (
+            {audioList.length > 0 && audioList.filter((file) => {
+                return file.name.toLowerCase().includes(searchKey.toLowerCase());
+            }).map((file, index) => (
                 <div className="data_row" key={index}>
                     <div className="data_cell">{file.name}</div>
                     <div className="data_cell">{file.duration}</div>
