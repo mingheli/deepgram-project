@@ -1,143 +1,125 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 80vw;
-  margin-left: 10vw;
-  font-family: 'Cairo', sans-serif;
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap");
+.wrapper{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 80vw;
+    margin-left: 10vw;
+    font-family: 'Cairo', sans-serif;
 }
-
 .title {
-  align-self: center;
+    align-self: center;
 }
-.actionrow {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
+.action-row {
+    display: flex;
+    font-weight: 600;
 }
 .search {
-  display: flex;
-  margin-top: 20px;
-  font-weight: 600;
+    display: flex;
+    margin-right: auto;
 }
-.search > input {
-  padding: 6px 10px;
-  border: 1px solid gray;
-  border-radius: 4px;
-  margin-left: 10px;
+.search-input {
+    padding-right: 10px
 }
-.upload {
-  display: flex;
-  align-self: flex-end;
-  font-weight: 600;
+#search-input {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
 }
-
-.grid {
-  display: grid;
-  grid-template-columns: 3fr 2fr 4fr 1fr 1fr;
-  width: 100%;
-  align-self: center;
+.upload-file {
+    margin-left: auto;
+    display: flex;
 }
-
-.header_row {
-  display: contents;
-  flex-grow: 1;
-  font-weight: 600;
-  text-transform: uppercase;
+.grid{
+    display:grid;
+    grid-template-columns: 2fr 3fr 3fr 1fr 1fr;
+    width: 100%;
+    align-self: center
 }
-
-.header_cell {
-  padding: 10px;
-  border-bottom: 2px solid black;
+.header-row {
+    display: contents;
+    flex-grow: 1;
+    font-weight: 600;
+    text-transform: uppercase;
 }
-
+.header-cell {
+   padding: 10px;
+   border-bottom: 2px solid black;
+}
+.data-row {
+    display: contents;
+}
 .highlight {
-  color: blue
+    font-weight: 600;
+}
+.data-cell {
+    display: flex;
+    padding: 10px;
+    border-bottom: 1px solid gray;
+
+}
+.data-cell>.active {
+    color: #0072FF;
+    font-weight: 600;
 }
 
-.header_cell:hover {
- cursor: pointer;
+.data-cell>.active:hover{
+    cursor: pointer;
+    color: #040636;
+    font-weight: 600;
 }
-
-.data_row {
-  display: contents;
+.custom-file-upload {
+    padding: 6px 26px;
+    cursor: pointer;
+    background-color: #00BB7C;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    text-transform: uppercase
 }
-
-.data_cell {
-  display: flex;
-  padding: 10px;
-  border-bottom: 1px solid gray;
-  font-weight: 600;
-}
-
-.transcriptName {
-  margin-top: 40px;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-  font-weight: 600;
+#file-upload {
+    display: none;
 }
 
 .transcript {
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  border: 1px solid gray;
-  min-height: calc(1.5em * 10);
-  height: auto;
+    display: flex;
+    flex-direction: column;
+    padding-top: 40px;
+    padding-bottom: 10px;
 }
-
-.custom-file-upload {
-  padding: 6px 26px;
-  cursor: pointer;
-  background-color: #00BB7C;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  text-transform: uppercase;
+.transcript-name {
+    font-weight: 600;
+    text-transform: uppercase;
 }
-
-#file-upload {
-  display: none;
+.transcript-detail {
+    border: 1px solid gray;
+    min-height: calc(1.5em*10);
+    height: auto;
+    padding: 10px;
 }
-
-.data_cell>.active {
-  transition: color bold 0.5s ease;
-  color: #0072FF;
-}
-
-.data_cell>.active:hover {
-  cursor: pointer;
-  color: #040636;
-}
-
-.inactive {
-  color: gray;
-}
-
 .loading-spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #007bff;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 1s linear infinite;
-  margin-right: 10px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #007bff;
+    border-radius: 50%;
+    width:24px;
+    height:24px;
+    animation:spin 1s linear infinite;
+    margin-right:10px;
 }
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes spin{
+    to{transform:rotate(360deg)};
 }
-
-.custom-sorting {
-  padding: 6px 26px;
-  cursor: pointer;
-  background-color: #00BB7C;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  text-transform: uppercase;
+.audio-player {
+    align-self: center;
+}
+.pagination-controls{
+    padding-top: 10px;
+    align-self: center;
+}
+.pagination-controls > button {
+    margin-left: 10px;
+    margin-right: 10px;
 }

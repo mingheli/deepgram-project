@@ -1,146 +1,197 @@
-import React, { useEffect, useState } from "react";
-import Header from "./components/Header";
-import Audios from "./components/Audios";
+import React, { useState } from 'react';
 import { formatDuration } from "./utils/formatterUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { v4 as uuidv4 } from 'uuid';
+
 import "./App.css";
 
 const flatData = (data, file) => {
-  const { metadata, results } = data
-  return ({
+  const result = {
+    id: uuidv4(),
     name: file.name,
-    duration: formatDuration(metadata.duration),
-    transcript: results.channels[0].alternatives[0].transcript,
-    size: (file.size / (1024 * 1024)).toFixed(2)
-  });
-}
-const sortData = (
-  data,
-  sortKey,
-  sortingDirection
-) => {
-  data.sort((a, b) => {
-    const relevantValueA = a[sortKey];
-    const relevantValueB = b[sortKey];
+    size: `${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+    duration: formatDuration(data.metadata.duration),
+    transcript: data.results.channels[0].alternatives[0].transcript
+  };
+  return result;
 
-    if (
-      sortingDirection === "UNSORTED" ||
-      sortingDirection === "ASCENDING"
-    ) {
-      if (relevantValueA < relevantValueB) return -1;
-      if (relevantValueA > relevantValueB) return 1;
-      return 0;
-    } else {
-      if (relevantValueA > relevantValueB) return -1;
-      if (relevantValueA < relevantValueB) return 1;
-      return 0;
-    }
-  });
-};
-const getNextSortingDirection = (sortingDirection) => {
-  if (
-    sortingDirection === "UNSORTED" ||
-    sortingDirection === "ASCENDING"
-  ) {
-    return "DESCENDING";
-  }
-  return "ASCENDING";
-};
+}
 
 const App = () => {
   const [files, setFiles] = useState([]);
-  const [audioList, setAudioList] = useState([]);
-  const [showTranscript, setShowTranscript] = useState(false);
+  const [audios, setAudios] = useState([]);
   const [currentFile, setCurrentFile] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
-  const [currentSortingKey, setCurrentSortingKey] = useState(null);
-  const [currentAudioUrl, setCurrentAudioUrl] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2; // Number of items per page
   const [sortingDirections, setSortingDirections] = useState({
     name: "UNSORTED",
-    duration: "UNSORTED",
     size: "UNSORTED",
+    duration: "UNSORTED"
   });
-  const TOKEN = process.env.REACT_APP_API_TOKEN;
-  const DEEPGRAM_HOST = process.env.REACT_APP_DEEPGRAM_HOST;
-
-  const sortColumn = (sortKey) => {
-    const newAudioList = [...audioList];
-
-    const currentSortingDirection = sortingDirections[sortKey];
-
-    sortData(newAudioList, sortKey, currentSortingDirection);
-    const nextSortingDirection = getNextSortingDirection(
-      currentSortingDirection
-    );
-
-    const newSortingDirections = { ...sortingDirections };
-    newSortingDirections[sortKey] = nextSortingDirection;
-
-    setAudioList(newAudioList);
-    setSortingDirections(newSortingDirections);
-    setCurrentSortingKey(sortKey);
-  };
-
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    setFiles([...files, selectedFile]);
-    fetchData(selectedFile);
-  };
-
   const fetchData = async (file) => {
-    setLoading(true);
     const options = {
       method: "POST",
       headers: {
-        'Content-Type': 'audio/wav',
-        "Authorization": `Token ${TOKEN}`,
+        "Content-Type": "audio/wav",
+        "Authorization": "Token dfb060e548c19845f05c27a03e94b24748b5fb05"
       },
-      body: file,
+      body: file
     }
-    const response = await fetch(`${DEEPGRAM_HOST}/v1/listen?language=en&model=enhanced&smart_format=true`, options);
-    const data = await response.json();
-    setAudioList([...audioList, flatData(data, file)]);
-    setLoading(false);
+    setLoading(true);
+    try {
+      const resp = await fetch("https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true", options);
+      const data = await resp.json();
+      const displayData = flatData(data, file);
+      setLoading(false);
+      return displayData;
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
   }
-  const handleTranscribe = (file) => {
-    setShowTranscript(true);
+  const handleFileChange = async (event) => {
+    const newAudio = await fetchData(event.target.files[0]);
+    setFiles([...files, files[0]]);
+    setAudios([...audios, newAudio]);
+    console.log(newAudio);
+  }
+  const handleTranscript = (file) => {
     setCurrentFile(file);
   }
-
-  const handleAudioPlay = (audioUrl) => {
-    setCurrentAudioUrl(audioUrl);
+  const handleFileDownload = (file) => {
+    const element = document.createElement('a');
+    const fileContent = file.transcript;
+    const blob = new Blob([fileContent], { type: "text/plain" });
+    element.href = URL.createObjectURL(blob);
+    element.download = `${file.name}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }
+  const getPaginatedData = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return audios.slice(startIndex, endIndex);
   };
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(audios.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  const sortData = (data, sortKey, sortingDirection) => {
+    data.sort((a, b) => {
+      const va = a[sortKey];
+      const vb = b[sortKey];
+      if (sortingDirection === "ASCENDING" || sortingDirection === "UNSORTED") {
+        if (va > vb) return 1;
+        if (va < vb) return -1;
+        return 0;
+      } else {
+        if (va > vb) return -1;
+        if (va < vb) return 1;
+        return 0;
+      }
+    });
+  };
+
+  const getNextDirection = (sortingDirection) => {
+    if (sortingDirection === "ASCENDING" || sortingDirection === "UNSORTED") {
+      return "DESCENDING";
+    } else {
+      return "ASCENDING";
+    }
+  }
+  const sortColum = (sortKey) => {
+    const newAudioList = [...audios];
+    const currentSortingDirection = sortingDirections[sortKey];
+    sortData(newAudioList, sortKey, currentSortingDirection);
+    const nextSortingDirection = getNextDirection(currentSortingDirection);
+    const newSortingDirections = { ...sortingDirections };
+    newSortingDirections[sortKey] = nextSortingDirection;
+    setAudios(newAudioList);
+    setSortingDirections(newSortingDirections);
+    setCurrentSortingKey(sortKey);
+  }
 
   return (
     <div className="wrapper">
-      <div className="title">
-        <h2>Deepgram Audio Server</h2>
-      </div>
-      <div className="actionrow">
+      <div className="title"><h2>Deepgram Audio Server</h2></div>
+      <div className="action-row">
         <div className="search">
-          <div>Search</div>
-          <input value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />
+          <label htmlFor="search-input" className="search-input">Search</label>
+          <input id="search-input" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />
         </div>
-        <div className="upload">
+        <div className="upload-file">
           {loading && <div className="loading-spinner"></div>}
-          <label htmlFor="file-upload" className="custom-file-upload">
-            Upload a file
-          </label>
+          <label htmlFor="file-upload" className="custom-file-upload">Upload a file</label>
           <input id="file-upload" type="file" onChange={handleFileChange} />
         </div>
       </div>
-      <div className='grid'>
-        <Header onSort={sortColumn} sortingDirections={sortingDirections} currentSortingKey={currentSortingKey} />
-        <Audios audioList={audioList} searchKey={searchValue} handleTranscribe={handleTranscribe} handleAudioPlay={handleAudioPlay} />
+      <div className="grid">
+        <div className="header-row">
+          {Object.keys(sortingDirections).map((key) => {
+            const direction = (sortingDirections[key] === "ASCENDING" || sortingDirections[key] === "UNSORTED") ? faArrowDown : faArrowUp;
+            return <div className="header-cell" onClick={() => sortColum(key)}>{key}<FontAwesomeIcon icon={direction} /></div>
+          })}
+          <div className="header-cell"></div>
+          <div className="header-cell"></div>
+        </div>
+        {audios?.length > 0 && getPaginatedData()
+          .filter((audio) => audio.name.toLowerCase().includes(searchValue.toLowerCase()))
+          .map((audio, index) =>
+            <div key={index} className={`data-row ${currentFile?.id === audio.id ? "highlight" : ""}`}>
+              <div className="data-cell">{audio.name}</div>
+              <div className="data-cell">{audio.duration}</div>
+              <div className="data-cell">{audio.size}</div>
+              <div className="data-cell">
+                <div className="active" onClick={() => handleTranscript(audio)}>
+                  TRANSCRIBE
+                </div>
+              </div>
+              <div className="data-cell">
+                <div className="active" onClick={() => handleFileDownload(audio)}>
+                  DOWNLOAD
+                </div>
+              </div>
+            </div>)}
+        {audios?.length === 0 && audios.map((audio) => <div className="dataRow">
+          <div className="data-cell"></div>
+          <div className="data-cell"></div>
+          <div className="data-cell"></div>
+          <div className="data-cell">TRANSCRIBE</div>
+          <div className="data-cell">DOWNLOAD</div>
+        </div>)}
       </div>
-      <div className="transcriptName">Transcript: {currentFile?.name}</div>
-      <div className="transcript">{currentFile?.transcript}</div>
+      <div className="transcript">
+        <div className="transcript-name">TRANSCRIPT: {currentFile?.name}</div>
+        <div className="transcript-detail">{currentFile?.transcript}</div>
+      </div>
       <div className="audio-player">
         <audio controls src={`/assets/${currentFile?.name}`}>
-          Your browser does not support the audio element.
+          Your browser does not support the audio element
         </audio>
       </div>
-    </div>
-  );
-};
-export default App;
+      <div className="pagination-controls">
+        <button onClick={handlePreviousPage} disabled={currentPage === 1}>
+          Previous
+        </button>
+        <span>Page {currentPage} of {Math.ceil(audios.length / itemsPerPage)}</span>
+        <button onClick={handleNextPage} disabled={currentPage === Math.ceil(audios.length / itemsPerPage)}>
+          Next
+        </button>
+      </div>
+
+    </div >
+
+  )
+}
+
+export default App
