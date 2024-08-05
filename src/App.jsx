@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { formatDuration } from "./utils/formatterUtils";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faArrowUp, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { v4 as uuidv4 } from 'uuid';
 
 import "./App.css";
@@ -9,10 +9,10 @@ import "./App.css";
 const flatData = (data, file) => {
   const result = {
     id: uuidv4(),
-    name: file.name,
-    size: `${(file.size / (1024 * 1024)).toFixed(2)}MB`,
-    duration: formatDuration(data.metadata.duration),
-    transcript: data.results.channels[0].alternatives[0].transcript
+    name: file?.name,
+    size: `${(file?.size / (1024 * 1024)).toFixed(2)}MB`,
+    duration: formatDuration(data?.metadata?.duration),
+    transcript: data?.results?.channels[0]?.alternatives[0]?.transcript
   };
   return result;
 
@@ -31,6 +31,7 @@ const App = () => {
     size: "UNSORTED",
     duration: "UNSORTED"
   });
+  const [error, setError] = useState(null);
   const fetchData = async (file) => {
     const options = {
       method: "POST",
@@ -44,11 +45,16 @@ const App = () => {
     try {
       const resp = await fetch("https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true", options);
       const data = await resp.json();
+      if (!resp.ok) {
+        throw new Error(data.err_msg || 'Error uploading, please retry');
+      }
       const displayData = flatData(data, file);
       setLoading(false);
+      setError(false);
       return displayData;
     } catch (error) {
       console.log(error);
+      setError("Error uploading, please retry");
       setLoading(false);
     }
   }
@@ -56,10 +62,10 @@ const App = () => {
     const newAudio = await fetchData(event.target.files[0]);
     setFiles([...files, files[0]]);
     setAudios([...audios, newAudio]);
-    console.log(newAudio);
   }
   const handleTranscript = (file) => {
     setCurrentFile(file);
+    setError(null);
   }
   const handleFileDownload = (file) => {
     const element = document.createElement('a');
@@ -70,6 +76,7 @@ const App = () => {
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
+    setError(null);
   }
   const getPaginatedData = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -119,6 +126,7 @@ const App = () => {
     setAudios(newAudioList);
     setSortingDirections(newSortingDirections);
     setCurrentSortingKey(sortKey);
+    setError(null);
   }
 
   return (
@@ -135,6 +143,7 @@ const App = () => {
           <input id="file-upload" type="file" onChange={handleFileChange} />
         </div>
       </div>
+      {error && <div className="error"><FontAwesomeIcon icon={faWarning} />{error}</div>}
       <div className="grid">
         <div className="header-row">
           {Object.keys(sortingDirections).map((key) => {
@@ -145,7 +154,7 @@ const App = () => {
           <div className="header-cell"></div>
         </div>
         {audios?.length > 0 && getPaginatedData()
-          .filter((audio) => audio.name.toLowerCase().includes(searchValue.toLowerCase()))
+          .filter((audio) => audio?.name?.toLowerCase().includes(searchValue.toLowerCase()))
           .map((audio, index) =>
             <div key={index} className={`data-row ${currentFile?.id === audio.id ? "highlight" : ""}`}>
               <div className="data-cell">{audio.name}</div>
