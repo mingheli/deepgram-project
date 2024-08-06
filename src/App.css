@@ -14,13 +14,15 @@
   display: flex;
 }
 .search {
+  display: flex;
   margin-right: auto;
+}
+.search-label {
   align-self: center;
 }
 #search-input {
-  margin-left: 10px;
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding: 6px 0;
+  margin-left: 6px;
 }
 .upload {
   display: flex;

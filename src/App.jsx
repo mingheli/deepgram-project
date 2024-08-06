@@ -37,7 +37,8 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [searchInput, setSearchInput] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 2;
 
   const TOKEN = process.env.REACT_APP_API_TOKEN;
@@ -82,10 +83,10 @@ const App = () => {
     setShowTranscript(true);
     setCurrentFile(file);
   }
-  const getPaginatedData = (newAudioList) => {
+  const getPaginatedData = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    return newAudioList.slice(startIndex, endIndex);
+    return audioList.slice(startIndex, endIndex);
   }
   const handleClickPrevious = () => {
     if (currentPage > 1) {
@@ -104,17 +105,25 @@ const App = () => {
       <div className="title">
         <h2>Deepgram Audio Server</h2>
       </div>
-      <div className="upload">
-        {loading && <div className="loading-spinner"></div>}
-        {/* {loading && <FontAwesomeIcon icon={faSpinner} spin />} */}
-        <button onClick={handleUploadClick} disabled={loading} className="custom-file-upload">
-          Upload a file
-        </button>
-        <input
-          ref={fileInputRef}
-          id="file-upload"
-          type="file"
-          onChange={handleFileChange} />
+      <div className="action-row">
+        <div className="search">
+          <label htmlFor="searchInput" className="search-label">
+            Search
+          </label>
+          <input id="search-input" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
+        </div>
+        <div className="upload">
+          {loading && <div className="loading-spinner"></div>}
+          {/* {loading && <FontAwesomeIcon icon={faSpinner} spin />} */}
+          <button onClick={handleUploadClick} disabled={loading} className="custom-file-upload">
+            Upload a file
+          </button>
+          <input
+            ref={fileInputRef}
+            id="file-upload"
+            type="file"
+            onChange={handleFileChange} />
+        </div>
       </div>
       {error && <div className="error">
         <FontAwesomeIcon icon={faWarning} /> {error}

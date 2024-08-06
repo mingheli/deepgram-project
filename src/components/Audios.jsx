@@ -11,7 +11,7 @@ const Audios = ({ audioList, handleTranscribe, currentFile, getPaginatedData }) 
     };
     return (
         <>
-            {audioList.length > 0 && getPaginatedData(audioList).map((file, index) => (
+            {audioList.length > 0 && getPaginatedData().map((file, index) => (
                 <div className={`data-row ${currentFile?.id === file?.id ? "selected" : ""}`} key={index}>
                     <div className="data-cell">{file.name}</div>
                     <div className="data-cell">{file.duration}</div>
