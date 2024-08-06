@@ -35,6 +35,7 @@ const App = () => {
   const [showTranscript, setShowTranscript] = useState(false);
   const [currentFile, setCurrentFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -85,24 +86,34 @@ const App = () => {
       <div className="title">
         <h2>Deepgram Audio Server</h2>
       </div>
-      <div className="upload">
-        {loading && <div className="loading-spinner"></div>}
-        {/* {loading && <FontAwesomeIcon icon={faSpinner} spin />} */}
-        <button onClick={handleUploadClick} disabled={loading} className="custom-file-upload">
-          Upload a file
-        </button>
-        <input
-          ref={fileInputRef}
-          id="file-upload"
-          type="file"
-          onChange={handleFileChange} />
+      <div className="action-row">
+        <div className="search">
+          <label htmlFor="search-input" className="search-input">Search</label>
+          <input id="search-input" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />
+        </div>
+        <div className="upload">
+          {loading && <div className="loading-spinner"></div>}
+          {/* {loading && <FontAwesomeIcon icon={faSpinner} spin />} */}
+          <button onClick={handleUploadClick} disabled={loading} className="custom-file-upload">
+            Upload a file
+          </button>
+          <input
+            ref={fileInputRef}
+            id="file-upload"
+            type="file"
+            onChange={handleFileChange} />
+        </div>
       </div>
+
       {error && <div className="error">
         <FontAwesomeIcon icon={faWarning} /> {error}
       </div>}
       <div className='grid'>
         <Header />
-        <Audios audioList={audioList} handleTranscribe={handleTranscribe} currentFile={currentFile} />
+        <Audios audioList={audioList}
+          handleTranscribe={handleTranscribe}
+          searchKey={searchValue}
+          currentFile={currentFile} />
       </div>
       <div className="transcriptName">Transcript: {currentFile?.name}</div>
       <div className="transcript">{currentFile?.transcript}</div>

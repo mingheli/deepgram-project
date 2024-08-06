@@ -1,4 +1,4 @@
-const Audios = ({ audioList, handleTranscribe, currentFile }) => {
+const Audios = ({ audioList, handleTranscribe, currentFile, searchKey }) => {
     const handleDownload = (file) => {
         const element = document.createElement('a');
         const fileContent = file.transcript;
@@ -11,22 +11,24 @@ const Audios = ({ audioList, handleTranscribe, currentFile }) => {
     };
     return (
         <>
-            {audioList.length > 0 && audioList.map((file, index) => (
-                <div className={`data_row ${currentFile?.id === file?.id ? "selected" : ""}`} key={index}>
-                    <div className="data_cell">{file.name}</div>
-                    <div className="data_cell">{file.duration}</div>
-                    <div className="data_cell">{file.size}MB</div>
-                    <div className="data_cell"><div className="transcribe_action active" onClick={() => handleTranscribe(file)}>TRANSCRIBE</div></div>
-                    <div className="data_cell"><div className="download_action active" onClick={() => handleDownload(file)}>DOWNLOAD</div></div>
-                </div>
-            ))}
+            {audioList.length > 0 && audioList
+                .filter((file) => file?.name?.toLowerCase().includes(searchKey?.toLowerCase()))
+                .map((file, index) => (
+                    <div className={`data-row ${currentFile?.id === file?.id ? "selected" : ""}`} key={index}>
+                        <div className="data-cell">{file.name}</div>
+                        <div className="data-cell">{file.duration}</div>
+                        <div className="data-cell">{file.size}MB</div>
+                        <div className="data-cell"><div className="transcribe-action active" onClick={() => handleTranscribe(file)}>TRANSCRIBE</div></div>
+                        <div className="data-cell"><div className="download-action active" onClick={() => handleDownload(file)}>DOWNLOAD</div></div>
+                    </div>
+                ))}
             {audioList.length === 0 &&
-                <div className="data_row">
-                    <div className="data_cell"></div>
-                    <div className="data_cell"></div>
-                    <div className="data_cell"></div>
-                    <div className="data_cell"><div className="transcribe_action inactive">TRANSCRIBE</div></div>
-                    <div className="data_cell"><div className="download_action inactive">DOWNLOAD</div></div>
+                <div className="data-row">
+                    <div className="data-cell"></div>
+                    <div className="data-cell"></div>
+                    <div className="data-cell"></div>
+                    <div className="data-cell"><div className="transcribe-action inactive">TRANSCRIBE</div></div>
+                    <div className="data-cell"><div className="download-action inactive">DOWNLOAD</div></div>
                 </div>
             }
         </>
