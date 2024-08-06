@@ -10,18 +10,6 @@
 .title {
   align-self: center;
 }
-.action-row {
-  display: flex;
-}
-.search {
-  margin-right: auto;
-  align-self: center;
-}
-#search-input {
-  margin-left: 10px;
-  padding-top: 6px;
-  padding-bottom: 6px;
-}
 .upload {
   display: flex;
   margin-left: auto;
