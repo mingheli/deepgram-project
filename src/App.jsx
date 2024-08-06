@@ -178,7 +178,7 @@ const App = () => {
           Your browser doesn't support the audio element
         </audio>
       </div>
-      <div className="pagination-control">
+      <div className="pagination-controls">
         <button onClick={handlePreviousPage} disable={currentPage === 1}>
           Previous
         </button>

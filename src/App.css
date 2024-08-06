@@ -130,3 +130,12 @@
     padding-top: 10px;
     align-self: center;
 }
+.pagination-controls {
+    padding-top: 10px;
+    align-self: center;
+}
+
+.pagination-controls>button {
+    margin-left: 10px;
+    margin-right: 10px;
+}
