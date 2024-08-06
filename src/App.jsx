@@ -37,6 +37,8 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 2;
   const [sortingDirections, setSortingDirections] = useState({
     name: "UNSORTED",
     duration: "UNSORTED",
@@ -118,6 +120,21 @@ const App = () => {
     setSortingDirections(newSortingDirections);
     setAudioList(newAudioList);
   }
+  const getPaginatedData = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return audioList.slice(startIndex, endIndex);
+  }
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(audioList.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  }
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  }
 
   return (
     <div className="wrapper">
@@ -151,6 +168,7 @@ const App = () => {
         <Audios audioList={audioList}
           handleTranscribe={handleTranscribe}
           searchKey={searchValue}
+          getPaginatedData={getPaginatedData}
           currentFile={currentFile} />
       </div>
       <div className="transcriptName">Transcript: {currentFile?.name}</div>
@@ -159,6 +177,15 @@ const App = () => {
         <audio controls src={`/assets/${currentFile?.name}`}>
           Your browser doesn't support the audio element
         </audio>
+      </div>
+      <div className="pagination-control">
+        <button onClick={handlePreviousPage} disable={currentPage === 1}>
+          Previous
+        </button>
+        <span>Page {currentPage} of {Math.ceil(audioList.length / itemsPerPage)}</span>
+        <button onClick={handleNextPage} disable={currentPage === Math.ceil(audioList.length / itemsPerPage)}>
+          Next
+        </button>
       </div>
     </div>
   );

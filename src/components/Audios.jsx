@@ -1,4 +1,4 @@
-const Audios = ({ audioList, handleTranscribe, currentFile, searchKey }) => {
+const Audios = ({ audioList, handleTranscribe, currentFile, searchKey, getPaginatedData }) => {
     const handleDownload = (file) => {
         const element = document.createElement('a');
         const fileContent = file.transcript;
@@ -11,7 +11,7 @@ const Audios = ({ audioList, handleTranscribe, currentFile, searchKey }) => {
     };
     return (
         <>
-            {audioList.length > 0 && audioList
+            {audioList.length > 0 && getPaginatedData(audioList)
                 .filter((file) => file?.name?.toLowerCase().includes(searchKey?.toLowerCase()))
                 .map((file, index) => (
                     <div className={`data-row ${currentFile?.id === file?.id ? "selected" : ""}`} key={index}>
