@@ -37,6 +37,8 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 2;
 
   const TOKEN = process.env.REACT_APP_API_TOKEN;
   const DEEPGRAM_HOST = process.env.REACT_APP_DEEPGRAM_HOST;
@@ -80,6 +82,22 @@ const App = () => {
     setShowTranscript(true);
     setCurrentFile(file);
   }
+  const getPaginatedData = (newAudioList) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return newAudioList.slice(startIndex, endIndex);
+  }
+  const handleClickPrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  }
+
+  const handleClickNext = () => {
+    if (currentPage < Math.ceil(audioList.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  }
 
   return (
     <div className="wrapper">
@@ -103,12 +121,20 @@ const App = () => {
       </div>}
       <div className='grid'>
         <Header />
-        <Audios audioList={audioList} handleTranscribe={handleTranscribe} currentFile={currentFile} />
+        <Audios audioList={audioList}
+          handleTranscribe={handleTranscribe}
+          currentFile={currentFile}
+          getPaginatedData={getPaginatedData} />
       </div>
       <div className="transcriptName">Transcript: {currentFile?.name}</div>
       <div className="transcript">{currentFile?.transcript}</div>
       <div className="audio-player-control">
         <audio controls src={`/assets/${currentFile?.name}`} />
+      </div>
+      <div className="pagination-control">
+        <button className="previous" disable={currentPage === 1} onClick={handleClickPrevious}>Previous</button>
+        <span> Page {currentPage} of {Math.ceil(audioList.length / itemsPerPage)}</span>
+        <button className="previous" disable={currentPage === Math.ceil(audioList.length / itemsPerPage)} onClick={handleClickNext}>Next</button>
       </div>
     </div>
   );
