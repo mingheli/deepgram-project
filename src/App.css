@@ -50,7 +50,7 @@
 .header-cell {
   padding: 10px;
   border-bottom: 2px solid black;
-  white-space: no-wrap;
+  white-space: nowrap;
 }
 
 .data-row {
