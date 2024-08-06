@@ -1,9 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import Header from "./components/Header";
 import Audios from "./components/Audios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWarning } from "@fortawesome/free-solid-svg-icons";
 import { v4 as uuidv4 } from 'uuid';
+import debounce from "lodash.debounce";
 import "./App.css";
 
 const formatDuration = (seconds) => {
@@ -39,15 +40,22 @@ const App = () => {
   const fileInputRef = useRef(null);
   const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const [currentSortColumn, setCurrentSortColumn] = useState("");
+  const itemsPerPage = 10;
+  const [sortingDirections, setSortingDirections] = useState({
+    name: "UNSORTED",
+    duration: "UNSORTED",
+    size: "UNSORTED"
+  })
 
   const TOKEN = process.env.REACT_APP_API_TOKEN;
   const DEEPGRAM_HOST = process.env.REACT_APP_DEEPGRAM_HOST;
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
+
+  const handleFileChange = debounce(async (event) => {
+    const selectedFile = await event.target.files[0];
     setFiles([...files, selectedFile]);
     fetchData(selectedFile);
-  };
+  }, 300);
 
   const fetchData = async (file) => {
     const options = {
@@ -83,11 +91,12 @@ const App = () => {
     setShowTranscript(true);
     setCurrentFile(file);
   }
-  const getPaginatedData = () => {
+  const getPaginatedData = useCallback(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return audioList.slice(startIndex, endIndex);
-  }
+  }, [audioList])
+
   const handleClickPrevious = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -99,6 +108,40 @@ const App = () => {
       setCurrentPage(currentPage + 1);
     }
   }
+  const sortData = (data, sortKey, direction) => {
+    data.sort((a, b) => {
+      const av = a[sortKey];
+      const bv = b[sortKey];
+      if (direction === "ASCENDING" || direction === "UNSORTED") {
+        if (av > bv) return 1;
+        if (av < bv) return -1;
+        return 0;
+      } else {
+        if (av > bv) return -1;
+        if (av < bv) return 1;
+        return 0;
+      }
+    })
+  }
+  const getNextSortingDirection = (currentDirection) => {
+    if (currentDirection === "ASCENDING" || currentDirection === "UNSORTED") {
+      return "DESCENDING";
+    } else {
+      return "ASCENDING";
+    }
+  }
+
+  const sortColumn = useCallback((sortKey) => {
+    setCurrentSortColumn(sortKey);
+    const newAudioList = [...audioList];
+    const currentDirection = sortingDirections[sortKey];
+    sortData(newAudioList, sortKey, currentDirection);
+    setAudioList(newAudioList);
+    const newSortingDirections = { ...sortingDirections };
+    const nextDirection = getNextSortingDirection(currentDirection);
+    newSortingDirections[sortKey] = nextDirection;
+    setSortingDirections(newSortingDirections);
+  }, [audioList, sortingDirections]);
 
   return (
     <div className="wrapper">
@@ -129,11 +172,12 @@ const App = () => {
         <FontAwesomeIcon icon={faWarning} /> {error}
       </div>}
       <div className='grid'>
-        <Header />
+        <Header sortColumn={sortColumn} sortingDirections={sortingDirections} currentSortColumn={currentSortColumn} />
         <Audios audioList={audioList}
           handleTranscribe={handleTranscribe}
           currentFile={currentFile}
-          getPaginatedData={getPaginatedData} />
+          getPaginatedData={getPaginatedData}
+          searchKey={searchInput} />
       </div>
       <div className="transcriptName">Transcript: {currentFile?.name}</div>
       <div className="transcript">{currentFile?.transcript}</div>
