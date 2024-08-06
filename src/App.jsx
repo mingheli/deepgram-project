@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import Header from "./components/Header";
 import Audios from "./components/Audios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -76,10 +76,10 @@ const App = () => {
     fileInputRef.current.click();
   };
 
-  const handleTranscribe = (file) => {
+  const handleTranscribe = useCallback((file) => {
     setShowTranscript(true);
     setCurrentFile(file);
-  }
+  }, [showTranscript, currentFile]);
 
   return (
     <div className="wrapper">
@@ -105,7 +105,7 @@ const App = () => {
         <Header />
         <Audios audioList={audioList} handleTranscribe={handleTranscribe} currentFile={currentFile} />
       </div>
-      <div className="transcriptName">Transcript: {currentFile?.name}</div>
+      <div className="transcript-name">Transcript: {currentFile?.name}</div>
       <div className="transcript">{currentFile?.transcript}</div>
     </div>
   );
