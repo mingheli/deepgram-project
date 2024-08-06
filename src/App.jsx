@@ -2,7 +2,8 @@ import React, { useState, useRef } from "react";
 import Header from "./components/Header";
 import Audios from "./components/Audios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWarning, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faWarning } from "@fortawesome/free-solid-svg-icons";
+import { v4 as uuidv4 } from 'uuid';
 import "./App.css";
 
 const formatDuration = (seconds) => {
@@ -20,10 +21,11 @@ const formatDuration = (seconds) => {
 const flatData = (data, file) => {
   const { metadata, results } = data
   return ({
-    name: file.name,
-    duration: formatDuration(metadata.duration),
-    transcript: results.channels[0].alternatives[0].transcript,
-    size: (file.size / (1024 * 1024)).toFixed(2)
+    id: uuidv4(),
+    name: file?.name,
+    duration: formatDuration(metadata?.duration),
+    transcript: results?.channels[0].alternatives[0].transcript,
+    size: (file?.size / (1024 * 1024)).toFixed(2)
   });
 }
 
@@ -100,7 +102,7 @@ const App = () => {
       </div>}
       <div className='grid'>
         <Header />
-        <Audios audioList={audioList} handleTranscribe={handleTranscribe} />
+        <Audios audioList={audioList} handleTranscribe={handleTranscribe} currentFile={currentFile} />
       </div>
       <div className="transcriptName">Transcript: {currentFile?.name}</div>
       <div className="transcript">{currentFile?.transcript}</div>

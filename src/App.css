@@ -45,6 +45,9 @@
 .data_row {
   display: contents;
 }
+.selected {
+  font-weight: 600;
+}
 
 .data_cell {
   display: flex;

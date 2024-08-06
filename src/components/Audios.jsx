@@ -1,4 +1,4 @@
-const Audios = ({ audioList, handleTranscribe }) => {
+const Audios = ({ audioList, handleTranscribe, currentFile }) => {
     const handleDownload = (file) => {
         const element = document.createElement('a');
         const fileContent = file.transcript;
@@ -12,7 +12,7 @@ const Audios = ({ audioList, handleTranscribe }) => {
     return (
         <>
             {audioList.length > 0 && audioList.map((file, index) => (
-                <div className="data_row" key={index}>
+                <div className={`data_row ${currentFile?.id === file?.id ? "selected" : ""}`} key={index}>
                     <div className="data_cell">{file.name}</div>
                     <div className="data_cell">{file.duration}</div>
                     <div className="data_cell">{file.size}MB</div>
