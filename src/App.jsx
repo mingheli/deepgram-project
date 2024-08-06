@@ -72,6 +72,7 @@ const App = () => {
   }
   const handleUploadClick = () => {
     setLoading(true);
+    setError(false);
     fileInputRef.current.click();
   };
 

@@ -12,10 +12,21 @@
 .title {
   align-self: center;
 }
-
+.action-row {
+    display: flex;
+}
+.search {
+    margin-right: auto;
+    align-self: center;
+}
+#search-input {
+    margin-left: 10px;
+    padding-top:6px;
+    padding-bottom:6px;
+}
 .upload {
   display: flex;
-  align-self: flex-end;
+  margin-left:auto;
   font-weight: 600;
 }
 .error {
@@ -40,6 +51,7 @@
 .header-cell {
   padding: 10px;
   border-bottom: 2px solid black;
+  white-space: nowrap;
 }
 
 .data-row {
@@ -72,7 +84,7 @@
 }
 
 .custom-file-upload {
-  padding: 10px 30px;
+  padding: 4px 30px;
   cursor: pointer;
   background-color: #00BB7C;
   color: white;
@@ -114,4 +126,17 @@
   to {
     transform: rotate(360deg);
   }
+}
+.audio-player {
+    padding-top: 10px;
+    align-self: center;
+}
+.pagination-controls {
+    padding-top: 10px;
+    align-self: center;
+}
+
+.pagination-controls>button {
+    margin-left: 10px;
+    margin-right: 10px;
 }
