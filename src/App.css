@@ -125,3 +125,7 @@
     transform: rotate(360deg);
   }
 }
+.audio-player {
+    padding-top: 10px;
+    align-self: center;
+}

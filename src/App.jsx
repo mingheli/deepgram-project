@@ -117,6 +117,11 @@ const App = () => {
       </div>
       <div className="transcriptName">Transcript: {currentFile?.name}</div>
       <div className="transcript">{currentFile?.transcript}</div>
+      <div className="audio-player">
+        <audio controls src={`/assets/${currentFile?.name}`}>
+          Your browser doesn't support the audio element
+        </audio>
+      </div>
     </div>
   );
 };
