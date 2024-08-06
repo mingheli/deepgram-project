@@ -107,6 +107,9 @@ const App = () => {
       </div>
       <div className="transcriptName">Transcript: {currentFile?.name}</div>
       <div className="transcript">{currentFile?.transcript}</div>
+      <div className="audio-player-control">
+        <audio controls src={`/assets/${currentFile?.name}`} />
+      </div>
     </div>
   );
 };
