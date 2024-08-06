@@ -37,6 +37,12 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [error, setError] = useState(null);
+  const [sortingDirections, setSortingDirections] = useState({
+    name: "UNSORTED",
+    duration: "UNSORTED",
+    size: "UNSORTED",
+
+  })
   const fileInputRef = useRef(null);
 
   const TOKEN = process.env.REACT_APP_API_TOKEN;
@@ -80,6 +86,38 @@ const App = () => {
     setShowTranscript(true);
     setCurrentFile(file);
   }
+  const sortData = (audioList, sortKey, sortDirection) => {
+    return audioList.sort((a, b) => {
+      const av = a[sortKey];
+      const bv = b[sortKey];
+      if (sortDirection === "ASCENDING" || sortDirection === "UNSORTED") {
+        if (av > bv) return 1;
+        if (av < bv) return -1;
+        return 0;
+      } else {
+        if (av > bv) return -1;
+        if (av < bv) return 1;
+        return 0;
+      }
+    })
+  }
+  const getNextSortDirection = (currentSortDirection) => {
+    if (currentSortDirection === "ASCENDING" || currentSortDirection === "UNSORTED") {
+      return "DESCENDING";
+    } else {
+      return "ASCENDING";
+    }
+  }
+  const sortColumn = (sortKey) => {
+    const newAudioList = [...audioList];
+    const currentSortDirection = sortingDirections[sortKey];
+    sortData(newAudioList, sortKey, currentSortDirection);
+    const nextSortDirection = getNextSortDirection(currentSortDirection);
+    const newSortingDirections = { ...sortingDirections };
+    newSortingDirections[sortKey] = nextSortDirection;
+    setSortingDirections(newSortingDirections);
+    setAudioList(newAudioList);
+  }
 
   return (
     <div className="wrapper">
@@ -109,7 +147,7 @@ const App = () => {
         <FontAwesomeIcon icon={faWarning} /> {error}
       </div>}
       <div className='grid'>
-        <Header />
+        <Header sortColumn={sortColumn} sortingDirections={sortingDirections} />
         <Audios audioList={audioList}
           handleTranscribe={handleTranscribe}
           searchKey={searchValue}
