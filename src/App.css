@@ -17,6 +17,7 @@
 }
 .search {
     margin-right: auto;
+    align-self: center;
 }
 #search-input {
     margin-left: 10px;
@@ -83,7 +84,7 @@
 }
 
 .custom-file-upload {
-  padding: 10px 30px;
+  padding: 4px 30px;
   cursor: pointer;
   background-color: #00BB7C;
   color: white;
