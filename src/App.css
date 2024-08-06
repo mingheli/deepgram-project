@@ -18,6 +18,10 @@
   align-self: flex-end;
   font-weight: 600;
 }
+.error {
+    color: red;
+    align-self: center;
+}
 
 .grid {
   display: grid;
@@ -46,7 +50,6 @@
   display: flex;
   padding: 10px;
   border-bottom: 1px solid gray;
-  font-weight: 600;
 }
 
 .transcriptName {
@@ -66,7 +69,7 @@
 }
 
 .custom-file-upload {
-  padding: 6px 26px;
+  padding: 10px 30px;
   cursor: pointer;
   background-color: #00BB7C;
   color: white;
@@ -82,6 +85,7 @@
 .data_cell>.active {
   transition: color bold 0.5s ease;
   color: #0072FF;
+  font-weight: 600;
 }
 
 .data_cell>.active:hover {

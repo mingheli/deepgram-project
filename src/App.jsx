@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Header from "./components/Header";
 import Audios from "./components/Audios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWarning, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import "./App.css";
 
 const formatDuration = (seconds) => {
@@ -31,6 +33,8 @@ const App = () => {
   const [showTranscript, setShowTranscript] = useState(false);
   const [currentFile, setCurrentFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
 
   const TOKEN = process.env.REACT_APP_API_TOKEN;
   const DEEPGRAM_HOST = process.env.REACT_APP_DEEPGRAM_HOST;
@@ -41,8 +45,6 @@ const App = () => {
   };
 
   const fetchData = async (file) => {
-
-    setLoading(true);
     const options = {
       method: "POST",
       headers: {
@@ -51,11 +53,26 @@ const App = () => {
       },
       body: file,
     }
-    const response = await fetch(`${DEEPGRAM_HOST}/v1/listen?language=en&model=enhanced&smart_format=true`, options);
-    const data = await response.json();
-    setAudioList([...audioList, flatData(data, file)]);
-    setLoading(false);
+    try {
+      const response = await fetch(`${DEEPGRAM_HOST}/v1/listen?language=en&model=enhanced&smart_format=true`, options);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.err_msg || 'Error uploading, please retry');
+      }
+      setAudioList([...audioList, flatData(data, file)]);
+      setLoading(false);
+      setError(null);
+    } catch (error) {
+      console.log(error);
+      setError("Error uploading, please retry");
+      setLoading(false);
+    }
   }
+  const handleUploadClick = () => {
+    setLoading(true);
+    fileInputRef.current.click();
+  };
+
   const handleTranscribe = (file) => {
     setShowTranscript(true);
     setCurrentFile(file);
@@ -68,17 +85,25 @@ const App = () => {
       </div>
       <div className="upload">
         {loading && <div className="loading-spinner"></div>}
-        <label htmlFor="file-upload" className="custom-file-upload">
+        {/* {loading && <FontAwesomeIcon icon={faSpinner} spin />} */}
+        <button onClick={handleUploadClick} disabled={loading} className="custom-file-upload">
           Upload a file
-        </label>
-        <input id="file-upload" type="file" onChange={handleFileChange} />
+        </button>
+        <input
+          ref={fileInputRef}
+          id="file-upload"
+          type="file"
+          onChange={handleFileChange} />
       </div>
+      {error && <div className="error">
+        <FontAwesomeIcon icon={faWarning} /> {error}
+      </div>}
       <div className='grid'>
         <Header />
         <Audios audioList={audioList} handleTranscribe={handleTranscribe} />
       </div>
-      {currentFile && <div className="transcriptName">Transcript: {currentFile.name}</div>}
-      {currentFile && <div className="transcript">{currentFile.transcript}</div>}
+      <div className="transcriptName">Transcript: {currentFile?.name}</div>
+      <div className="transcript">{currentFile?.transcript}</div>
     </div>
   );
 };
