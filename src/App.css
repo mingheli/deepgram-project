@@ -30,26 +30,26 @@
   align-self: center;
 }
 
-.header_row {
+.header-row {
   display: contents;
   flex-grow: 1;
   font-weight: 600;
   text-transform: uppercase;
 }
 
-.header_cell {
+.header-cell {
   padding: 10px;
   border-bottom: 2px solid black;
 }
 
-.data_row {
+.data-row {
   display: contents;
 }
 .selected {
   font-weight: 600;
 }
 
-.data_cell {
+.data-cell {
   display: flex;
   padding: 10px;
   border-bottom: 1px solid gray;
@@ -85,13 +85,13 @@
   display: none;
 }
 
-.data_cell>.active {
+.data-cell>.active {
   transition: color bold 0.5s ease;
   color: #0072FF;
   font-weight: 600;
 }
 
-.data_cell>.active:hover {
+.data-cell>.active:hover {
   cursor: pointer;
   color: #040636;
 }
