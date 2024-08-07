@@ -59,14 +59,14 @@ const App = () => {
       const response = await fetch(`${DEEPGRAM_HOST}/v1/listen?language=en&model=enhanced&smart_format=true`, options);
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.err_msg || 'Error uploading, please retry');
+        throw new Error(data.err_msg);
       }
       setAudioList([...audioList, flatData(data, file)]);
       setLoading(false);
       setError(null);
     } catch (error) {
       console.log(error);
-      setError("Error uploading, please retry");
+      setError(error.message);
       setLoading(false);
     }
   }
