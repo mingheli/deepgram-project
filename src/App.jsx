@@ -40,40 +40,95 @@ const App = () => {
 
   const TOKEN = process.env.REACT_APP_API_TOKEN;
   const DEEPGRAM_HOST = process.env.REACT_APP_DEEPGRAM_HOST;
-  const handleFileChange = (event) => {
+
+  const handleFileChange = async (event) => {
     const selectedFile = event.target.files[0];
     setFiles([...files, selectedFile]);
-    fetchData(selectedFile);
+    setLoading(false);
+    await fetchData(selectedFile);
+  };
+
+  const handleUploadClick = () => {
+    setLoading(true);
+    setError(false);
+    fileInputRef.current.value = '';
+    fileInputRef.current.click();
   };
 
   const fetchData = async (file) => {
+    const requestId = uuidv4(); // Generate a unique requestId
+    const newAudio = {
+      id: requestId,
+      name: file?.name,
+      duration: null, // Initially null, will be updated later
+      transcript: null, // Initially null, will be updated later
+      size: (file?.size / (1024 * 1024)).toFixed(2)
+    };
+    setAudioList((prevAudioList) => [...prevAudioList, newAudio]);
+
     const options = {
       method: "POST",
       headers: {
         'Content-Type': 'audio/wav',
-        "Authorization": `Token ${TOKEN}`,
+        'Authorization': `Token ${TOKEN}`
       },
-      body: file,
+      body: file
+    };
+
+    const response = await fetch(`${DEEPGRAM_HOST}/v1/listen`, options);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-    try {
-      const response = await fetch(`${DEEPGRAM_HOST}/v1/listen?language=en&model=enhanced&smart_format=true`, options);
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.err_msg);
-      }
-      setAudioList([...audioList, flatData(data, file)]);
-      setLoading(false);
-      setError(null);
-    } catch (error) {
-      console.log(error);
-      setError(error.message);
-      setLoading(false);
+    const data = await response.json();
+    const { metadata, results } = data;
+
+    // Update the audio object with the new data
+    setAudioList((prevAudioList) =>
+      prevAudioList.map((audio) =>
+        audio.id === requestId
+          ? {
+            ...audio,
+            duration: formatDuration(metadata?.duration),
+            transcript: results?.channels[0].alternatives[0].transcript
+          }
+          : audio
+      )
+    );
+    setLoading(false);
+    setError(null);
+  };
+
+  const refetchData = async (file) => {
+    const options = {
+      method: "POST",
+      headers: {
+        'Content-Type': 'audio/wav',
+        'Authorization': `Token ${TOKEN}`
+      },
+      body: file
+    };
+
+    const response = await fetch(`${DEEPGRAM_HOST}/v1/listen`, options);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-  }
-  const handleUploadClick = () => {
-    setLoading(true);
-    setError(false);
-    fileInputRef.current.click();
+    const data = await response.json();
+    const { metadata, results } = data;
+
+    // Update the audio object with the new data
+    setAudioList((prevAudioList) =>
+      prevAudioList.map((audio) =>
+        audio.id === requestId
+          ? {
+            ...audio,
+            duration: formatDuration(metadata?.duration),
+            transcript: results?.channels[0].alternatives[0].transcript
+          }
+          : audio
+      )
+    );
+    setLoading(false);
+    setError(null);
   };
 
   const handleTranscribe = useCallback((file) => {
@@ -103,7 +158,7 @@ const App = () => {
       </div>}
       <div className='grid'>
         <Header />
-        <Audios audioList={audioList} handleTranscribe={handleTranscribe} currentFile={currentFile} />
+        <Audios audioList={audioList} handleTranscribe={handleTranscribe} currentFile={currentFile} refetchData={refetchData} />
       </div>
       <div className="transcript-name">Transcript: {currentFile?.name}</div>
       <div className="transcript">{currentFile?.transcript}</div>
