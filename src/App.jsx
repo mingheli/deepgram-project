@@ -43,6 +43,34 @@ const App = () => {
   const DEEPGRAM_HOST = process.env.REACT_APP_DEEPGRAM_HOST;
 
   useEffect(() => {
+    // Initialize audioList with some initial loading data
+    const initialData = [
+      {
+        id: 1,
+        duration: "0.03:21",
+        size: "3.4MB",
+        name: "aaa.wav",
+        transcript: "This is a sample transcript for example1.wav",
+      },
+      {
+        id: 2,
+        duration: "0.02:21",
+        size: "2.4MB",
+        name: "bbb.wav",
+        transcript: "This is a sample transcript for example2.wav",
+      },
+      {
+        id: 3,
+        duration: "0.02:21",
+        size: "2.4MB",
+        name: "ccc.wav",
+        transcript: "This is a sample transcript for example2.wav",
+      },
+    ];
+    setAudioList(initialData);
+  }, []);
+
+  useEffect(() => {
     if (fileInputClicked && !fileInputRef.current.files.length) {
       setLoading(false);
       setFileInputClicked(false);
