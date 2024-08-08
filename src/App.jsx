@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import Header from "./components/Header";
 import Audios from "./components/Audios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -36,17 +36,41 @@ const App = () => {
   const [currentFile, setCurrentFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [fileInputClicked, setFileInputClicked] = useState(false);
   const fileInputRef = useRef(null);
 
   const TOKEN = process.env.REACT_APP_API_TOKEN;
   const DEEPGRAM_HOST = process.env.REACT_APP_DEEPGRAM_HOST;
+
+  useEffect(() => {
+    if (fileInputClicked && !fileInputRef.current.files.length) {
+      setLoading(false);
+      setFileInputClicked(false);
+    }
+  }, [fileInputClicked])
+
+  const handleFileInputClick = () => {
+    setFileInputClicked(true);
+  }
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
+    if (!selectedFile) {
+      setLoading(false); //if user cancel select file, should disable the spinner
+      setFileInputClicked(false);
+      return;
+    }
     setFiles([...files, selectedFile]);
     fetchData(selectedFile);
   };
 
+  const handleUploadClick = () => {
+    setLoading(true);
+    setError(false);
+    fileInputRef.current.click();
+  };
+
   const fetchData = async (file) => {
+    setLoading(true);
     const options = {
       method: "POST",
       headers: {
@@ -70,11 +94,6 @@ const App = () => {
       setLoading(false);
     }
   }
-  const handleUploadClick = () => {
-    setLoading(true);
-    setError(false);
-    fileInputRef.current.click();
-  };
 
   const handleTranscribe = useCallback((file) => {
     setShowTranscript(true);
@@ -96,6 +115,7 @@ const App = () => {
           ref={fileInputRef}
           id="file-upload"
           type="file"
+          onClick={handleFileInputClick}
           onChange={handleFileChange} />
       </div>
       {error && <div className="error">
