@@ -19,7 +19,10 @@
   color: red;
   align-self: center;
 }
-
+.placeholder {
+  color: rgb(179, 172, 172);
+  font-style: italic;
+}
 .grid {
   max-height: 400px;
   overflow: auto;

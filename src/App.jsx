@@ -11,7 +11,7 @@ const formatDuration = (seconds) => {
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = (seconds % 60).toFixed(0);
 
-  const formattedHours = String(hours).padStart(2, '0');
+  const formattedHours = String(hours).padStart(1, '0');
   const formattedMinutes = String(minutes).padStart(2, '0');
   const formattedSeconds = String(secs).padStart(2, '0');
 
@@ -25,7 +25,7 @@ const flatData = (data, file) => {
     name: file?.name,
     duration: formatDuration(metadata?.duration),
     transcript: results?.channels[0].alternatives[0].transcript,
-    size: (file?.size / (1024 * 1024)).toFixed(2)
+    size: (file?.size / (1024 * 1024)).toFixed(1)
   });
 }
 
@@ -47,21 +47,21 @@ const App = () => {
     const initialData = [
       {
         id: 1,
-        duration: "0.03:21",
+        duration: "0:03:21",
         size: "3.4",
         name: "aaa.wav",
         transcript: "This is a sample transcript for example1.wav",
       },
       {
         id: 2,
-        duration: "0.02:21",
+        duration: "0:02:21",
         size: "2.4",
         name: "bbb.wav",
         transcript: "This is a sample transcript for example2.wav",
       },
       {
         id: 3,
-        duration: "0.02:21",
+        duration: "0:02:21",
         size: "2.4",
         name: "ccc.wav",
         transcript: "This is a sample transcript for example2.wav",
@@ -154,7 +154,7 @@ const App = () => {
         <Audios audioList={audioList} handleTranscribe={handleTranscribe} currentFile={currentFile} />
       </div>
       <div className="transcript-name">Transcript: {currentFile?.name}</div>
-      <div className="transcript">{currentFile?.transcript}</div>
+      <div className="transcript">{currentFile?.transcript ?? <span className="placeholder">Transcribing...</span>}</div>
     </div>
   );
 };
