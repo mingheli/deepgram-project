@@ -126,3 +126,10 @@
   margin-left: 10px;
   margin-right: 10px;
 }
+
+.transcribe-action {
+  display: flex;
+}
+.transcribe-action > span {
+  margin-left: 3px;
+}

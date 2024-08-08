@@ -143,7 +143,6 @@ const App = () => {
       </div>
       <div className="upload">
         {loading && <div className="loading-spinner"></div>}
-        {/* {loading && <FontAwesomeIcon icon={faSpinner} spin />} */}
         <button onClick={handleUploadClick} disabled={loading} className="custom-file-upload">
           Upload a file
         </button>
