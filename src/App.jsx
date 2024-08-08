@@ -124,9 +124,8 @@ const App = () => {
   }
 
   const handleTranscribe = useCallback((file) => {
-    setShowTranscript(true);
     setCurrentFile(file);
-  }, [showTranscript, currentFile]);
+  }, [currentFile]);
 
   return (
     <div className="wrapper">

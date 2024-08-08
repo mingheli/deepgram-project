@@ -24,7 +24,7 @@
   font-style: italic;
 }
 .grid {
-  max-height: 400px;
+  max-height: 600px;
   overflow: auto;
   display: grid;
   grid-template-columns: 3fr 3fr 3fr 1fr 1fr;
