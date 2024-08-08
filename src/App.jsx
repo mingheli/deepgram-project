@@ -52,7 +52,7 @@ const App = () => {
   const handleFileInputClick = () => {
     setFileInputClicked(true);
   }
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const selectedFile = event.target.files[0];
     if (!selectedFile) {
       setLoading(false); //if user cancel select file, should disable the spinner
@@ -60,7 +60,7 @@ const App = () => {
       return;
     }
     setFiles([...files, selectedFile]);
-    fetchData(selectedFile);
+    await fetchData(selectedFile);
   };
 
   const handleUploadClick = () => {
