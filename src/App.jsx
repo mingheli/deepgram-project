@@ -37,6 +37,8 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fileInputClicked, setFileInputClicked] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("general");
+  const [currentRawFile, setCurrentRawFile] = useState(null);
   const fileInputRef = useRef(null);
 
   const TOKEN = process.env.REACT_APP_API_TOKEN;
@@ -97,7 +99,7 @@ const App = () => {
     fileInputRef.current.click();
   };
 
-  const fetchData = async (file) => {
+  const fetchData = async (file, currentModel = "general") => {
     setLoading(true);
     const options = {
       method: "POST",
@@ -108,7 +110,7 @@ const App = () => {
       body: file,
     }
     try {
-      const response = await fetch(`${DEEPGRAM_HOST}/v1/listen?language=en&model=enhanced&smart_format=true`, options);
+      const response = await fetch(`${DEEPGRAM_HOST}/v1/listen?language=en&model=nova-2-${currentModel}&smart_format=true`, options);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.err_msg);
@@ -123,10 +125,18 @@ const App = () => {
     }
   }
 
-  const handleTranscribe = useCallback((file) => {
-    setCurrentFile(file);
+  const handleTranscribe = useCallback((flatFile) => {
+    setCurrentFile(flatFile);
+    const rFile = files.filter((file) => file.name === flatFile.name);
+    if (rFile) {
+      setCurrentRawFile(rFile[0]);
+    }
   }, [currentFile]);
 
+  const handleSelectModel = async (e) => {
+    setSelectedModel(e.target.value);
+    await fetchData(currentRawFile, e.target.value);
+  }
   return (
     <div className="wrapper">
       <div className="title">
@@ -152,8 +162,25 @@ const App = () => {
         <Header />
         <Audios audioList={audioList} handleTranscribe={handleTranscribe} currentFile={currentFile} />
       </div>
-      <div className="transcript-name">Transcript: {currentFile?.name}</div>
-      <div className="transcript">{currentFile?.transcript ?? <span className="placeholder">Transcribing...</span>}</div>
+      <div className="transcript-control">
+        <div className="main-transcript">
+          <div className="transcript-name">Transcript: {currentFile?.name}</div>
+          <div className="transcript">{currentFile?.transcript ?? <span className="placeholder">Transcribing...</span>}</div>
+        </div>
+        <div className="side-transcript">
+          <div className="transcript-name">Transcript: {currentFile?.name}</div>
+          <div className="select-model">
+            <select value={selectedModel} onChange={(e) => handleSelectModel(e)}>
+              <option value="meeting">meeting</option>
+              <option value="video">video</option>
+              <option value="phonecall">phonecall</option>
+              <option value="finance">finance</option>
+              <option value="medical">medical</option>
+            </select>
+          </div>
+          <div className="transcript">{currentFile?.transcript ?? <span className="placeholder">Transcribing...</span>}</div>
+        </div>
+      </div>
     </div>
   );
 };

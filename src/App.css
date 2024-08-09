@@ -132,3 +132,15 @@
   margin-left: 10px;
   margin-right: 10px;
 }
+.transcript-control {
+  display: flex;
+  gap: 10px;
+}
+.main-transcript {
+  margin-right: auto;
+  width: 40vw;
+}
+.side-transcript {
+  margin-left: auto;
+  width: 40vw;
+}
